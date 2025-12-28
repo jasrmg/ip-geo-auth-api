@@ -1,5 +1,12 @@
 import jwt from "jsonwebtoken";
 
+// Helper function to get JWT secret safely at runtime
+const getJWTSecret = () => {
+  return (
+    process.env.JWT_SECRET || "dev-fallback-secret-please-set-jwt-secret-in-env"
+  );
+};
+
 export const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.replace("Bearer ", "");
 
@@ -8,7 +15,10 @@ export const authMiddleware = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Get secret at request time, not module load time
+    const JWT_SECRET = getJWTSecret();
+
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.userId;
     next();
   } catch (error) {

@@ -1,8 +1,8 @@
-import db from "../config/database.js";
+import { prepare } from "../config/database.js";
 
 export const SearchHistory = {
   create: (userId, ipAddress, geoData) => {
-    const stmt = db.prepare(`
+    const stmt = prepare(`
       INSERT INTO search_history 
       (user_id, ip_address, city, region, country, loc, org, postal, timezone)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -24,7 +24,7 @@ export const SearchHistory = {
   },
 
   findByUserId: (userId) => {
-    const stmt = db.prepare(`
+    const stmt = prepare(`
       SELECT * FROM search_history 
       WHERE user_id = ? 
       ORDER BY searched_at DESC
@@ -33,7 +33,7 @@ export const SearchHistory = {
   },
 
   deleteById: (id, userId) => {
-    const stmt = db.prepare(
+    const stmt = prepare(
       "DELETE FROM search_history WHERE id = ? AND user_id = ?"
     );
     const result = stmt.run(id, userId);
@@ -42,7 +42,7 @@ export const SearchHistory = {
 
   deleteMultiple: (ids, userId) => {
     const placeholders = ids.map(() => "?").join(",");
-    const stmt = db.prepare(`
+    const stmt = prepare(`
       DELETE FROM search_history 
       WHERE id IN (${placeholders}) AND user_id = ?
     `);

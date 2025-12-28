@@ -1,11 +1,20 @@
+// ========================================
+// dotenv loaded via -r flag in package.json
+// ========================================
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import geoRoutes from "./routes/geo.js";
-import "./config/database.js";
+import { initDatabase } from "./config/database.js";
 
-dotenv.config();
+// Validate critical environment variables
+if (!process.env.JWT_SECRET) {
+  console.error("\n⚠️  WARNING: JWT_SECRET is not defined in .env file!");
+  console.error(
+    "Using fallback secret for development. This is NOT secure for production."
+  );
+  console.error("Please add JWT_SECRET to your .env file.\n");
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -23,6 +32,23 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-app.listen(PORT, () => {
-  console.log(`API server running on port ${PORT}`);
-});
+// Initialize database then start server
+initDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`\n✅ API server running on http://localhost:${PORT}`);
+      console.log(`✅ Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`✅ Database: ${process.env.DB_PATH || "./database.sqlite"}`);
+
+      if (process.env.JWT_SECRET) {
+        console.log(`✅ JWT_SECRET: Configured`);
+      } else {
+        console.log(`⚠️  JWT_SECRET: Using fallback (not recommended)`);
+      }
+      console.log();
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Failed to initialize database:", err);
+    process.exit(1);
+  });

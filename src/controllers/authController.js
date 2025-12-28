@@ -1,6 +1,13 @@
 import jwt from "jsonwebtoken";
 import { User } from "../models/User.js";
 
+// Helper function to get JWT secret safely at runtime
+const getJWTSecret = () => {
+  return (
+    process.env.JWT_SECRET || "dev-fallback-secret-please-set-jwt-secret-in-env"
+  );
+};
+
 export const login = (req, res) => {
   const { email, password } = req.body;
 
@@ -14,17 +21,25 @@ export const login = (req, res) => {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  });
+  try {
+    // Get secret at request time, not module load time
+    const JWT_SECRET = getJWTSecret();
 
-  res.json({
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-    },
-  });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("JWT signing error:", error.message);
+    res.status(500).json({ error: "Failed to generate authentication token" });
+  }
 };
 
 export const verifyToken = (req, res) => {

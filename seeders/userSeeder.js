@@ -1,22 +1,33 @@
-import dotenv from "dotenv";
+// ========================================
+// dotenv loaded via -r flag in package.json
+// ========================================
 import { User } from "../src/models/User.js";
-import "../src/config/database.js";
+import { initDatabase } from "../src/config/database.js";
 
-dotenv.config();
+const seedUsers = async () => {
+  // Warn if JWT_SECRET is missing
+  if (!process.env.JWT_SECRET) {
+    console.warn("\n⚠️  WARNING: JWT_SECRET not set in .env file");
+    console.warn("Using fallback secret for development\n");
+  }
 
-const seedUsers = () => {
   try {
-    // Create test user
+    await initDatabase();
+
     const userId = User.create("test@example.com", "password123");
-    console.log("✅ User seeded successfully!");
-    console.log("Email: test@example.com");
-    console.log("Password: password123");
-    console.log(`User ID: ${userId}`);
+    console.log("\n✅ User seeded successfully!");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("📧 Email: test@example.com");
+    console.log("🔑 Password: password123");
+    console.log(`🆔 User ID: ${userId}`);
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
   } catch (error) {
-    if (error.message.includes("UNIQUE constraint failed")) {
-      console.log("ℹ️  Test user already exists");
+    if (error.message && error.message.includes("UNIQUE")) {
+      console.log("\nℹ️  Test user already exists");
+      console.log("📧 Email: test@example.com");
+      console.log("🔑 Password: password123\n");
     } else {
-      console.error("❌ Error seeding user:", error.message);
+      console.error("\n❌ Error seeding user:", error.message, "\n");
     }
   }
 };
