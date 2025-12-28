@@ -22,7 +22,7 @@ export const login = (req, res) => {
   }
 
   try {
-    // Get secret at request time, not module load time
+    // Get secret at request time
     const JWT_SECRET = getJWTSecret();
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {

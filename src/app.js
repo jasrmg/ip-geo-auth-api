@@ -9,7 +9,7 @@ import { initDatabase } from "./config/database.js";
 
 // Validate critical environment variables
 if (!process.env.JWT_SECRET) {
-  console.error("\n⚠️  WARNING: JWT_SECRET is not defined in .env file!");
+  console.error("\n  WARNING: JWT_SECRET is not defined in .env file!");
   console.error(
     "Using fallback secret for development. This is NOT secure for production."
   );
@@ -36,19 +36,19 @@ app.get("/health", (req, res) => {
 initDatabase()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`\n✅ API server running on http://localhost:${PORT}`);
-      console.log(`✅ Environment: ${process.env.NODE_ENV || "development"}`);
-      console.log(`✅ Database: ${process.env.DB_PATH || "./database.sqlite"}`);
+      console.log(`\n API server running on http://localhost:${PORT}`);
+      console.log(` Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(` Database: ${process.env.DB_PATH || "./database.sqlite"}`);
 
       if (process.env.JWT_SECRET) {
-        console.log(`✅ JWT_SECRET: Configured`);
+        console.log(` JWT_SECRET: Configured`);
       } else {
-        console.log(`⚠️  JWT_SECRET: Using fallback (not recommended)`);
+        console.log(`  JWT_SECRET: Using fallback (not recommended)`);
       }
       console.log();
     });
   })
   .catch((err) => {
-    console.error("❌ Failed to initialize database:", err);
+    console.error(" Failed to initialize database:", err);
     process.exit(1);
   });
