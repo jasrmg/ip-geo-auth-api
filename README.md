@@ -31,10 +31,17 @@ Update the values:
 PORT=3001
 JWT_SECRET=your-super-secret-jwt-key-change-this
 DB_PATH=./database.sqlite
-IPINFO_TOKEN=optional-token-from-ipinfo.io
 ```
 
-### 3. Seed Database
+### 3. Validate Environment (Recommended)
+
+Before starting the server, run the validation script to ensure your `.env` is configured correctly:
+
+```bash
+npm run validate
+```
+
+### 4. Seed Database
 
 ```bash
 npm run seed
@@ -45,7 +52,7 @@ Test credentials:
 - Email: `test@example.com`
 - Password: `password123`
 
-### 4. Run Development Server
+### 5. Run Development Server
 
 ```bash
 npm run dev
